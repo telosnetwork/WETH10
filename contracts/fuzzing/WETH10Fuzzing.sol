@@ -1,25 +1,25 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 pragma solidity ^0.7.6;
-import "../WETH10.sol";
+import "../WTLOS10.sol";
 
 
 /// @dev A contract that will receive weth, and allows for it to be retrieved.
 contract MockHolder {
-    constructor (address payable weth, address retriever) {
-        WETH10(weth).approve(retriever, type(uint).max);
+    constructor (address payable wtlos, address retriever) {
+        WTLOS10(wtlos).approve(retriever, type(uint).max);
     }
 }
 
 /// @dev Invariant testing
-contract WETH10Fuzzing {
+contract WTLOS10Fuzzing {
 
-    WETH10 internal weth;
+    WTLOS10 internal wtlos;
     address internal holder;
 
     /// @dev Instantiate the WETH10 contract, and a holder address that will return weth when asked to.
     constructor () {
-        weth = new WETH10();
-        holder = address(new MockHolder(address(weth), address(this)));
+        wtlos = new WTLOS10();
+        holder = address(new MockHolder(address(wtlos), address(this)));
     }
 
     /// @dev Receive ETH when withdrawing.
@@ -38,42 +38,42 @@ contract WETH10Fuzzing {
     }
 
     /// @dev Test that supply and balance hold on deposit.
-    function deposit(uint ethAmount) public {
-        uint supply = address(weth).balance;
-        uint balance = weth.balanceOf(address(this));
-        weth.deposit{value: ethAmount}(); // It seems that echidna won't let the total value sent go over type(uint256).max
-        assert(address(weth).balance == add(supply, ethAmount));
-        assert(weth.balanceOf(address(this)) == add(balance, ethAmount));
-        assert(address(weth).balance == address(weth).balance);
+    function deposit(uint tlosAmount) public {
+        uint supply = address(wtlos).balance;
+        uint balance = wtlos.balanceOf(address(this));
+        wtlos.deposit{value: tlosAmount}(); // It seems that echidna won't let the total value sent go over type(uint256).max
+        assert(address(wtlos).balance == add(supply, tlosAmount));
+        assert(wtlos.balanceOf(address(this)) == add(balance, tlosAmount));
+        assert(address(wtlos).balance == address(wtlos).balance);
     }
 
     /// @dev Test that supply and balance hold on withdraw.
-    function withdraw(uint ethAmount) public {
-        uint supply = address(weth).balance;
-        uint balance = weth.balanceOf(address(this));
-        weth.withdraw(ethAmount);
-        assert(address(weth).balance == sub(supply, ethAmount));
-        assert(weth.balanceOf(address(this)) == sub(balance, ethAmount));
-        assert(address(weth).balance == address(weth).balance);
+    function withdraw(uint tlosAmount) public {
+        uint supply = address(wtlos).balance;
+        uint balance = wtlos.balanceOf(address(this));
+        wtlos.withdraw(tlosAmount);
+        assert(address(wtlos).balance == sub(supply, tlosAmount));
+        assert(wtlos.balanceOf(address(this)) == sub(balance, tlosAmount));
+        assert(address(wtlos).balance == address(wtlos).balance);
     }
 
     /// @dev Test that supply and balance hold on transfer.
-    function transfer(uint ethAmount) public {
-        uint thisBalance = weth.balanceOf(address(this));
-        uint holderBalance = weth.balanceOf(holder);
-        weth.transfer(holder, ethAmount);
-        assert(weth.balanceOf(address(this)) == sub(thisBalance, ethAmount));
-        assert(weth.balanceOf(holder) == add(holderBalance, ethAmount));
-        assert(address(weth).balance == address(weth).balance);
+    function transfer(uint tlosAmount) public {
+        uint thisBalance = wtlos.balanceOf(address(this));
+        uint holderBalance = wtlos.balanceOf(holder);
+        wtlos.transfer(holder, tlosAmount);
+        assert(wtlos.balanceOf(address(this)) == sub(thisBalance, tlosAmount));
+        assert(wtlos.balanceOf(holder) == add(holderBalance, tlosAmount));
+        assert(address(wtlos).balance == address(wtlos).balance);
     }
 
     /// @dev Test that supply and balance hold on transferFrom.
-    function transferFrom(uint ethAmount) public {
-        uint thisBalance = weth.balanceOf(address(this));
-        uint holderBalance = weth.balanceOf(holder);
-        weth.transferFrom(holder, address(this), ethAmount);
-        assert(weth.balanceOf(address(this)) == add(thisBalance, ethAmount));
-        assert(weth.balanceOf(holder) == sub(holderBalance, ethAmount));
-        assert(address(weth).balance == address(weth).balance);
+    function transferFrom(uint tlosAmount) public {
+        uint thisBalance = wtlos.balanceOf(address(this));
+        uint holderBalance = wtlos.balanceOf(holder);
+        wtlos.transferFrom(holder, address(this), tlosAmount);
+        assert(wtlos.balanceOf(address(this)) == add(thisBalance, tlosAmount));
+        assert(wtlos.balanceOf(holder) == sub(holderBalance, tlosAmount));
+        assert(address(wtlos).balance == address(wtlos).balance);
     }
 }
